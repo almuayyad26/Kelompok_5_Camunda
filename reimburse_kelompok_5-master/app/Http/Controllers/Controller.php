@@ -4,10 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class Controller extends BaseController
 {
     public function index()
+    {
+        return view('index');
+    }
+
+    public function task1()
     {
         return view('task1');
     }
@@ -48,12 +54,12 @@ class Controller extends BaseController
 
         $result = json_decode($result, true);
 
-        return redirect('/')->with(['success' => 'Berhasil!']);
+        return redirect('task2')->with(['success' => 'Berhasil!']);
     }
 
     public function task2()
     {
-        $TASK_ENDPOINT = "http://localhost:8080/engine-rest/task/?processDefinitionKey=process_reimburse_wisnu&name=Review";
+        $TASK_ENDPOINT = "http://localhost:8080/engine-rest/task/?processDefinitionKey=process_reimburse_wisnu";
 
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $TASK_ENDPOINT);
@@ -64,7 +70,7 @@ class Controller extends BaseController
         $data = [
             'results' => json_decode($result, true)
         ];
-
+        
         return view('task2', $data);
     }
 
@@ -94,7 +100,7 @@ class Controller extends BaseController
         return redirect('/task2')->with(['success' => 'Berhasil!']);
     }
 
-    public function review($id)
+    public function detail($id)
     {
         $TASK_ENDPOINT = "http://localhost:8080/engine-rest/task/$id/variables";
 
@@ -113,41 +119,7 @@ class Controller extends BaseController
             'keterangan' => $result['keterangan']['value']
         ];
 
-        return view('review', $data);
-    }
-
-    public function receive()
-    {
-        $TASK_ENDPOINT = "http://localhost:8080/engine-rest/task/?processDefinitionKey=process_reimburse_wisnu&name=Input+Bukti+Transfer";
-
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $TASK_ENDPOINT);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        $result = curl_exec($curl);
-        curl_close($curl);
-
-        $data = [
-            'results' => json_decode($result, true)
-        ];
-        
-        return view('receive', $data);
-    }
-
-    public function reject()
-    {
-        $TASK_ENDPOINT = "http://localhost:8080/engine-rest/task/?processDefinitionKey=process_reimburse_wisnu&name=Input+Alasan+Penolakan";
-
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $TASK_ENDPOINT);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        $result = curl_exec($curl);
-        curl_close($curl);
-
-        $data = [
-            'results' => json_decode($result, true)
-        ];
-
-        return view('reject', $data);
+        return view('detail', $data);
     }
 
     public function sendReceive($id)
@@ -163,7 +135,7 @@ class Controller extends BaseController
 
         $result = json_decode($result, true);
 
-        return redirect('/receive')->with(['success' => 'Berhasil!']);
+        return redirect('task2')->with(['success' => 'Berhasil!']);
     }
 
     public function sendReject($id)
@@ -179,6 +151,6 @@ class Controller extends BaseController
 
         $result = json_decode($result, true);
 
-        return redirect('/reject')->with(['success' => 'Berhasil!']);
+        return redirect('task2')->with(['success' => 'Berhasil!']);
     }
 }
