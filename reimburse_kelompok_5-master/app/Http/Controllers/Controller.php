@@ -14,7 +14,11 @@ class Controller extends BaseController
 
     public function submit(Request $request)
     {
-        $URL = 'http://sistemis.cloud.javan.co.id/engine-rest/process-definition/key/process_reimburse_wisnu/start';
+        if($request['nama'] === null || $request['jumlah'] === null){
+            return redirect('/')->with(['warning' => 'Nama dan Jumlah tidak boleh kosong!']);
+        }
+
+        $URL = 'http://localhost:8080/engine-rest/process-definition/key/process_reimburse_wisnu/start';
 
         $data = [
             'nama' => [
@@ -44,12 +48,12 @@ class Controller extends BaseController
 
         $result = json_decode($result, true);
 
-        return $result;
+        return redirect('/')->with(['success' => 'Berhasil!']);
     }
 
     public function task2()
     {
-        $TASK_ENDPOINT = 'http://sistemis.cloud.javan.co.id/engine-rest/task';
+        $TASK_ENDPOINT = "http://localhost:8080/engine-rest/task/?processDefinitionKey=process_reimburse_wisnu&name=Review";
 
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $TASK_ENDPOINT);
@@ -64,24 +68,11 @@ class Controller extends BaseController
         return view('task2', $data);
     }
 
-    public function task2submit()
-    {
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, 'http://sistemis.cloud.javan.co.id/engine-rest/process-instance?processDefinitionKey=process_reimburse_wisnu&businessKey=myBusinessKeyDamar');
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        $result = curl_exec($curl);
-        curl_close($curl);
-
-        $result = json_decode($result, true);
-
-        return $result;
-    }
-
     public function approve(Request $request)
     {
         $id = $request['id'];
         $approved = $request['approve'] === "true" ? true : false;
-        $URL = "http://sistemis.cloud.javan.co.id/engine-rest/task/$id/submit-form";
+        $URL = "http://localhost:8080/engine-rest/task/$id/submit-form";
 
         $data = [
             'isApproved' => [
@@ -100,6 +91,94 @@ class Controller extends BaseController
 
         $result = json_decode($result, true);
 
-        return redirect('/task2')->with(['success' => 'hasil perhitungan: '.$result]);;
+        return redirect('/task2')->with(['success' => 'Berhasil!']);
+    }
+
+    public function review($id)
+    {
+        $TASK_ENDPOINT = "http://localhost:8080/engine-rest/task/$id/variables";
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $TASK_ENDPOINT);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($curl);
+        curl_close($curl);
+
+        $result = json_decode($result, true);
+        
+        $data = [
+            'id' => $id,
+            'nama' => $result['nama']['value'],
+            'jumlah' => $result['jumlah']['value'],
+            'keterangan' => $result['keterangan']['value']
+        ];
+
+        return view('review', $data);
+    }
+
+    public function receive()
+    {
+        $TASK_ENDPOINT = "http://localhost:8080/engine-rest/task/?processDefinitionKey=process_reimburse_wisnu&name=Input+Bukti+Transfer";
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $TASK_ENDPOINT);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($curl);
+        curl_close($curl);
+
+        $data = [
+            'results' => json_decode($result, true)
+        ];
+        
+        return view('receive', $data);
+    }
+
+    public function reject()
+    {
+        $TASK_ENDPOINT = "http://localhost:8080/engine-rest/task/?processDefinitionKey=process_reimburse_wisnu&name=Input+Alasan+Penolakan";
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $TASK_ENDPOINT);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($curl);
+        curl_close($curl);
+
+        $data = [
+            'results' => json_decode($result, true)
+        ];
+
+        return view('reject', $data);
+    }
+
+    public function sendReceive($id)
+    {
+        $URL = "http://localhost:8080/engine-rest/task/$id/submit-form";
+
+        $curl = curl_init($URL);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, '');
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($curl);
+        curl_close($curl);
+
+        $result = json_decode($result, true);
+
+        return redirect('/receive')->with(['success' => 'Berhasil!']);
+    }
+
+    public function sendReject($id)
+    {
+        $URL = "http://localhost:8080/engine-rest/task/$id/submit-form";
+
+        $curl = curl_init($URL);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, '');
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($curl);
+        curl_close($curl);
+
+        $result = json_decode($result, true);
+
+        return redirect('/reject')->with(['success' => 'Berhasil!']);
     }
 }

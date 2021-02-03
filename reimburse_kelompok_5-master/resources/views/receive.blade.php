@@ -19,7 +19,7 @@
                     <tbody>
                         @foreach ($results as $result)
                         <tr>
-                            <td><a href="/review/<?= $result['id'] ?>">{{ $result['name'] }}</a></td>
+                        <td>{{ $result['name'] }}<a href="/sendReceive/<?= $result['id'] ?>">Send Email</a></td>
                         </tr>
                         @endforeach
                     </tbody>
