@@ -66,6 +66,18 @@
       <artifactId>spring-boot-starter-jdbc</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-s3</artifactId>
+      <version>1.11.864</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.minio</groupId>
+      <artifactId>minio</artifactId>
+      <version>7.1.2</version>
+    </dependency>
+
   </dependencies>
 
   <build>
