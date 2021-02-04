@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', 'Controller@index');
+Route::get('/login', 'Controller@login');
 
 Route::get('/task1', 'Controller@task1');
 Route::post('/submit', 'Controller@submit');

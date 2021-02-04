@@ -13,6 +13,11 @@ class Controller extends BaseController
         return view('index');
     }
 
+    public function login()
+    {
+        return view('task1');
+    }
+
     public function task1()
     {
         return view('task1');
