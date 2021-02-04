@@ -1,7 +1,7 @@
 @extends('templates/layout')
 
 @section('container')
-    <div class="container">
+    <div class="container mt-5">
         @if ($message = Session::get('success'))
             <div class="alert alert-success alert-block mt-3">
                 <button type="button" class="close" data-dismiss="alert">×</button>	
@@ -13,15 +13,40 @@
                 <table class="table">
                     <thead class="thead-dark">
                         <tr>
-                            <th>Hasil</th>
+                            <th scope="col">No</th>
+                            <th scope="col">Review</th>
+                            <th scope="col">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($results as $result)
+                    @if ($results === [])
                         <tr>
-                            <td><a href="/review/<?= $result['id'] ?>">{{ $result['name'] }}</a></td>
+                            <td>Data Kosong</td>
                         </tr>
+                        
+                    @else
+                        @foreach ($results as $result)
+                            @if ($result['name'] === 'Input Bukti Transfer')
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $result['name'] }}</td>
+                                <td><a href="/sendReceive/<?= $result['id'] ?>" class="badge badge-secondary">Kirim</a></td>
+                            </tr>
+                            @elseif ($result['name'] === 'Input Alasan Penolakan')
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $result['name'] }}</td>
+                                <td><a href="/sendReject/<?= $result['id'] ?>" class="badge badge-secondary">Kirim</a></td>
+                            </tr>
+                            @else
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $result['name'] }}</td>
+                                <td><a href="/detail/<?= $result['id'] ?>" class="badge badge-success">Detail</a></td>
+                            </tr>
+                            @endif
                         @endforeach
+                    @endif
                     </tbody>
                 </table>
             </div>

@@ -19,8 +19,8 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-                    <a class="nav-link" href="/">Pengajuan</a>
-                    <a class="nav-link" href="/task2">Review</a>
+                    <a class="nav-link" href="/task1">Input Reimburse</a>
+                    <a class="nav-link" href="/task2">Waiting List</a>
                 </div>
             </div>
         </div>
