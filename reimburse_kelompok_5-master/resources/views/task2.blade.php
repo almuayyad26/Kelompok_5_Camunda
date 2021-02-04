@@ -30,13 +30,13 @@
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $result['name'] }}</td>
-                                <td><a href="/sendReceive/<?= $result['id'] ?>" class="badge badge-secondary">Kirim</a></td>
+                                <td><a href="/bukti/<?= $result['id'] ?>" class="badge badge-success">Detail</a></td>
                             </tr>
                             @elseif ($result['name'] === 'Input Alasan Penolakan')
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $result['name'] }}</td>
-                                <td><a href="/sendReject/<?= $result['id'] ?>" class="badge badge-secondary">Kirim</a></td>
+                                <td><a href="/bukti/<?= $result['id'] ?>" class="badge badge-success">Detail</a></td>
                             </tr>
                             @else
                             <tr>
