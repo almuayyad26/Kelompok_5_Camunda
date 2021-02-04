@@ -35,7 +35,7 @@ public class Minio {
         minioClient.listBuckets().forEach(b -> System.out.println(b.name()));
 
         URL url = new URL(
-                "edit_url.jpg");
+                "https://assets-a1.kompasiana.com/items/album/2020/03/10/hidup-harus-sukses-ilustrasi-5e670f80d541df78ab7ff1d2.jpg");
         Path tempFile = Files.createTempFile(bukti, ".jpg");
         try (InputStream in = url.openStream()) {
             Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
