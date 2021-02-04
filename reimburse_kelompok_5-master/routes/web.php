@@ -23,6 +23,9 @@ Route::get('/task2', 'Controller@task2');
 Route::get('/detail/{id}', 'Controller@detail');
 Route::post('/approve', 'Controller@approve');
 
+Route::get('/bukti/{id}', 'Controller@bukti');
+Route::post('/sendBukti', 'Controller@sendBukti');
+
 Route::get('/sendReceive/{id}', 'Controller@sendReceive');
 
 Route::get('/sendReject/{id}', 'Controller@sendReject');
