@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -48,7 +49,7 @@ class Controller extends BaseController
             ]
         ];
 
-        $BUSINESS_KEY = "{$request['nama']}Business";
+        $BUSINESS_KEY = "{$request['nama']}_business";
 
         $laporan = json_encode(array('variables' => $data, 'businessKey' => $BUSINESS_KEY));
 
@@ -81,6 +82,28 @@ class Controller extends BaseController
         return view('task2', $data);
     }
 
+    public function detail($id)
+    {
+        $URL = "http://localhost:8080/engine-rest/task/$id/variables";
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $URL);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($curl);
+        curl_close($curl);
+
+        $result = json_decode($result, true);
+        
+        $data = [
+            'id' => $id,
+            'nama' => $result['nama']['value'],
+            'jumlah' => $result['jumlah']['value'],
+            'keterangan' => $result['keterangan']['value']
+        ];
+
+        return view('detail', $data);
+    }
+
     public function approve(Request $request)
     {
         $id = $request['id'];
@@ -107,60 +130,12 @@ class Controller extends BaseController
         return redirect('/task2')->with(['success' => 'Berhasil!']);
     }
 
-    public function detail($id)
-    {
-        $TASK_ENDPOINT = "http://localhost:8080/engine-rest/task/$id/variables";
-
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $TASK_ENDPOINT);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        $result = curl_exec($curl);
-        curl_close($curl);
-
-        $result = json_decode($result, true);
-        
-        $data = [
-            'id' => $id,
-            'nama' => $result['nama']['value'],
-            'jumlah' => $result['jumlah']['value'],
-            'keterangan' => $result['keterangan']['value']
-        ];
-
-        return view('detail', $data);
-    }
-
-    public function sendBukti(Request $request)
-    {   
-        // SEND GAMBAR
-        $request->validate([
-            'bukti' => 'required',
-        ]);
-        
-        //file ada di storage/app/bukti_transfer
-        $request->file('bukti')->store('bukti_transfer');
-        
-        //SEND EMAIL
-        $id = $request['id'];
-        $URL = "http://localhost:8080/engine-rest/task/$id/submit-form";
-        
-        $curl = curl_init($URL);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, '');
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        $result = curl_exec($curl);
-        curl_close($curl);
-
-        $result = json_decode($result, true);
-
-        return redirect('task2')->with(['success' => 'Berhasil !']);
-    }
-
     public function bukti($id)
     {
-        $TASK_ENDPOINT = "http://localhost:8080/engine-rest/task/$id/variables";
-
+        $URL = "http://localhost:8080/engine-rest/task/$id/variables";
+        
         $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $TASK_ENDPOINT);
+        curl_setopt($curl, CURLOPT_URL, $URL);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $result = curl_exec($curl);
         curl_close($curl);
@@ -177,12 +152,40 @@ class Controller extends BaseController
         return view('bukti', $data);
     }
 
-    public function sendReceive($id)
-    {
+    public function sendBukti(Request $request)
+    {   
+        // SEND GAMBAR
+        $request->validate([
+            'bukti' => 'required',
+        ]);
+
+        // encode base64
+        if ($request->hasFile('bukti')) {
+            if($request->file('bukti')->isValid()) {
+                try {
+                    $file = $request->file('bukti');
+                    $image = base64_encode(file_get_contents($file));
+                    echo $image;
+                } catch (FileNotFoundException $e) {
+                    echo $e;
+                }
+            }
+        }
+        
+        // SEND EMAIL
+        $id = $request['id'];
         $URL = "http://localhost:8080/engine-rest/task/$id/submit-form";
 
+        $data = [
+            'bukti' => [
+                'value' => $image
+            ]
+        ];
+
+        $laporan = json_encode(array('variables' => $data));
+
         $curl = curl_init($URL);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, '');
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $laporan);
         curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $result = curl_exec($curl);
@@ -190,22 +193,6 @@ class Controller extends BaseController
 
         $result = json_decode($result, true);
 
-        return redirect('task2')->with(['success' => 'Berhasil!']);
-    }
-
-    public function sendReject($id)
-    {
-        $URL = "http://localhost:8080/engine-rest/task/$id/submit-form";
-
-        $curl = curl_init($URL);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, '');
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        $result = curl_exec($curl);
-        curl_close($curl);
-
-        $result = json_decode($result, true);
-
-        return redirect('task2')->with(['success' => 'Berhasil!']);
+        return redirect('task2')->with(['success' => 'Berhasil !']);
     }
 }

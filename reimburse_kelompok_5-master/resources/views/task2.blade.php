@@ -26,22 +26,14 @@
                         
                     @else
                         @foreach ($results as $result)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $result['name'] }}</td>
                             @if ($result['name'] === 'Input Bukti Transfer')
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $result['name'] }}</td>
                                 <td><a href="/bukti/<?= $result['id'] ?>" class="badge badge-success">Detail</a></td>
-                            </tr>
                             @elseif ($result['name'] === 'Input Alasan Penolakan')
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $result['name'] }}</td>
                                 <td><a href="/bukti/<?= $result['id'] ?>" class="badge badge-success">Detail</a></td>
-                            </tr>
                             @else
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $result['name'] }}</td>
                                 <td><a href="/detail/<?= $result['id'] ?>" class="badge badge-success">Detail</a></td>
                             </tr>
                             @endif
